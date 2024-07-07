@@ -40,7 +40,7 @@ export const generateAndSetRefreshToken = async (userId: Types.ObjectId, c: Cont
 export const verifyToken = async (token: string) => {
   try {
     const { payload } = await jose.jwtVerify(token, SECRET);
-    return payload.userId;
+    return payload.userId as string;
   } catch (err: any) {
     return null;
   }
