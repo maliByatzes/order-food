@@ -1,12 +1,16 @@
 import { z } from "zod";
 
+const ROLES = ["user", "driver"] as const;
+
 export const createUserSchema = z.object({
   name: z.string().max(101),
   email: z.string().email(),
   password: z.string().min(8),
   confirmPassword: z.string(),
   phone: z.string().min(10),
-}).refine((data) => Object.is(data.password, data.confirmPassword), {
+  role: z.enum(ROLES),
+}).required()
+.refine((data) => Object.is(data.password, data.confirmPassword), {
   message: "Passwords do not match",
   path: ["confirmPassword"]
 });

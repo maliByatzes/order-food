@@ -10,6 +10,7 @@ app.get('/healthchecker', (c) => {
   return c.json({ "message": "Welcome to order-food service" });
 });
 
-app.basePath("/api/v1").route("/auth", authRoutes);
+const apiRoutes = app.basePath("/api/v1").route("/auth", authRoutes);
 
 export default app;
+export type ApiRoutes = typeof apiRoutes;

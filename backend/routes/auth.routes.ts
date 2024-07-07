@@ -30,6 +30,7 @@ authRoutes.post("/register", zValidator("json", createUserSchema), async (c) => 
       email: formUser.email,
       password: hashedPassword,
       phone: formUser.phone,
+      role: formUser.role
     });
 
     if (newUser) {
@@ -45,6 +46,7 @@ authRoutes.post("/register", zValidator("json", createUserSchema), async (c) => 
         name: newUser.name,
         email: newUser.email,
         phone: newUser.phone,
+        role: newUser.role,
         createdAt: newUser.createdAt,
         updatedAt: newUser.updatedAt
       }, 201);
@@ -82,6 +84,7 @@ authRoutes.post("/login", zValidator("json", loginUserSchema), async (c) => {
       name: existingUser.name,
       email: existingUser.email,
       phone: existingUser.phone,
+      role: existingUser.role,
       createdAt: existingUser.createdAt,
       updatedAt: existingUser.updatedAt
     }, 200);
