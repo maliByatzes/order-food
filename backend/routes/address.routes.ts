@@ -105,7 +105,7 @@ addressRoutes.put("/:id", protectRoute, zValidator("json", updateAddressSchema),
       }
     }
 
-    const updatedAddress = await Address.findByIdAndUpdate(addressId, addressForm, { new: true });
+    const updatedAddress = await Address.findOneAndUpdate({ _id: addressId, userId }, addressForm, { new: true });
     if (!updatedAddress) {
       return c.notFound();
     }
@@ -117,13 +117,37 @@ addressRoutes.put("/:id", protectRoute, zValidator("json", updateAddressSchema),
   }
 });
 
-addressRoutes.delete("/:id", protectRoute, (c) => {
-  console.log(c.req.param("id"));
-  return c.text("Delete one address handler");
+addressRoutes.delete("/:id", protectRoute, async (c) => {
+  const addressId = c.req.param("id");
+  const userId = c.get("user")._id;
+
+  try {
+    if (addressId.length !== 24) {
+      return c.json({ error: "Invalid address id" }, 400);
+    }
+
+    const deleteResult = await Address.deleteOne({ _id: addressId, userId });
+    if (deleteResult.deletedCount !== 1) {
+      return c.notFound();
+    }
+
+    return c.json({ message: "success" }, 200);
+  } catch (err: any) {
+    console.error(`Error in delete one address handler: ${err.message}`);
+    return c.json({ error: "Internal Server Error" }, 500);
+  }
 });
 
-addressRoutes.delete("/", protectRoute, (c) => {
-  return c.text("Delete all addresses handler");
+addressRoutes.delete("/", protectRoute, async (c) => {
+  const userId = c.get("user")._id;
+
+  try {
+    await Address.deleteMany({ userId });
+    return c.json({ message: "success" }, 200);
+  } catch (err: any) {
+    console.error(`Error in delete all address handler: ${err.message}`);
+    return c.json({ error: "Internal Server Error" }, 500);
+  }
 });
 
 export default addressRoutes;
