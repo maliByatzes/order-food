@@ -41,8 +41,7 @@ addressRoutes.post("/", protectRoute, zValidator("json", createAddressSchema), a
     if (newAddress) {
       await newAddress.save();
 
-      c.status(201)
-      return c.json(newAddress);
+      return c.json(newAddress, 201);
     } else {
       return c.json({ error: "Invalid address data" }, 400);
     }
@@ -64,9 +63,25 @@ addressRoutes.get("/", protectRoute, async (c) => {
   }
 });
 
-addressRoutes.get("/:id", protectRoute, (c) => {
-  console.log(c.req.param("id"));
-  return c.text("Get one address handler");
+addressRoutes.get("/:id", protectRoute, async (c) => {
+  const addressId = c.req.param("id");
+  const userId = c.get("user")._id;
+
+  try {
+    if (addressId.length !== 24) {
+      return c.json({ error: "Invalid address id" }, 400);
+    }
+
+    const address = await Address.findOne({ _id: addressId, userId });
+    if (!address) {
+      return c.notFound();
+    }
+
+    return c.json(address, 200);
+  } catch (err: any) {
+    console.error(`Error in get one address handler: ${err.message}`);
+    return c.json({ error: "Internal Server Error" }, 500);
+  }
 });
 
 addressRoutes.put("/:id", protectRoute, (c) => {

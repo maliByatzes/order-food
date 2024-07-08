@@ -14,7 +14,7 @@ userRoutes.get("/me", protectRoute, async (c) => {
       return c.notFound();
     }
 
-    return c.json({ user }, 200);
+    return c.json(user, 200);
   } catch (err: any) {
     console.error(`Error in get me handler: ${err.message}`);
     return c.json({ error: "Internal Server Error" }, 500);
