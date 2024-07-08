@@ -33,7 +33,7 @@ export const protectRoute = createMiddleware(async (c: Context, next: Next) => {
       return c.json({ error: "Unauthorized - User not found" }, 404);
     }
 
-    c.set("user", { user });
+    c.set("user", user);
 
     await next();
   } catch (err: any) {

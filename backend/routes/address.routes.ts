@@ -1,9 +1,16 @@
 import { Hono } from "hono";
 import { protectRoute } from "../middleware/protectRoute";
+import type { IUser } from "../models/user.model";
 
-const addressRoutes = new Hono()
+type Variables = {
+  user: IUser
+}
+
+const addressRoutes = new Hono<{ Variables: Variables }>()
 
 addressRoutes.post("/", protectRoute, (c) => {
+  const user = c.get("user");
+  console.log(user.email);
   return c.text("Create address handler");
 });
 
