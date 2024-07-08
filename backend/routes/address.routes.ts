@@ -3,9 +3,9 @@ import { protectRoute } from "../middleware/protectRoute";
 import type { IUser } from "../models/user.model";
 import { zValidator } from "@hono/zod-validator";
 import { createAddressSchema } from "../schemas/address.schema";
-import Address, { type IAddress } from "../models/address.model";
+import Address from "../models/address.model";
 
-type Variables = {
+export type Variables = {
   user: IUser
 }
 
@@ -17,7 +17,7 @@ addressRoutes.post("/", protectRoute, zValidator("json", createAddressSchema), a
 
   try {
     if (addressForm.isDefault) {
-      const addresses: IAddress[] | null = await Address.find({ userId: user._id });
+      const addresses = await Address.find({ userId: user._id });
       if (addresses) {
         const address = addresses.find((address) => address.isDefault);
         if (address) {
@@ -52,8 +52,16 @@ addressRoutes.post("/", protectRoute, zValidator("json", createAddressSchema), a
   }
 });
 
-addressRoutes.get("/", protectRoute, (c) => {
-  return c.text("Get all addresses handler");
+addressRoutes.get("/", protectRoute, async (c) => {
+  const user = c.get("user");
+
+  try {
+    const addresses = await Address.find({ userId: user._id });
+    return c.json(addresses, 200);
+  } catch (err: any) {
+    console.error(`Error in get all addresses handler: ${err.message}`);
+    return c.json({ error: "Internal Server Error" }, 500);
+  }
 });
 
 addressRoutes.get("/:id", protectRoute, (c) => {

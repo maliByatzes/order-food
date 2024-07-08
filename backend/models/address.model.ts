@@ -1,19 +1,22 @@
-import mongoose, { Document } from "mongoose";
+import mongoose from "mongoose";
 
-export interface IAddress extends Document {
+export interface IAddress {
+  _id?: mongoose.Types.ObjectId,
   userId: mongoose.Types.ObjectId,
-  unitNumber: string,
+  unitNumber?: string,
   addressLine1: string,
-  addressLine2: string,
+  addressLine2?: string,
   postalCode: number,
   city: string,
   country: string,
-  isDefault: boolean
+  isDefault: boolean,
+  createdAt: Date,
+  updatedAt: Date
 };
 
-const addressSchema = new mongoose.Schema({
+const addressSchema = new mongoose.Schema<IAddress>({
   userId: {
-    type: mongoose.Types.ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true
   },
