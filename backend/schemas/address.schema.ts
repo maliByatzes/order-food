@@ -19,3 +19,13 @@ export const createAddressSchema = z.object({
   addressLine2: true,
   isDefault: true
 });
+
+export const updateAddressSchema = z.object({
+  unitNumber: z.string(),
+  addressLine1: z.string(),
+  addressLine2: z.string(),
+  postalCode: z.number(),
+  city: z.string(),
+  country: z.enum(COUNTRIES),
+  isDefault: z.boolean()
+}).partial();

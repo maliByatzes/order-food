@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { protectRoute } from "../middleware/protectRoute";
 import type { IUser } from "../models/user.model";
 import { zValidator } from "@hono/zod-validator";
-import { createAddressSchema } from "../schemas/address.schema";
+import { createAddressSchema, updateAddressSchema } from "../schemas/address.schema";
 import Address from "../models/address.model";
 
 export type Variables = {
@@ -84,9 +84,37 @@ addressRoutes.get("/:id", protectRoute, async (c) => {
   }
 });
 
-addressRoutes.put("/:id", protectRoute, (c) => {
-  console.log(c.req.param("id"));
-  return c.text("Update one address handler");
+addressRoutes.put("/:id", protectRoute, zValidator("json", updateAddressSchema), async (c) => {
+  const addressId = c.req.param("id");
+  const userId = c.get("user")._id;
+  const addressForm = c.req.valid("json");
+
+  try {
+    if (addressId.length !== 24) {
+      return c.json({ error: "Invalid address id" }, 400);
+    }
+
+    if (addressForm.isDefault) {
+      const addresses = await Address.find({ userId });
+      if (addresses) {
+        const address = addresses.find((address) => address.isDefault);
+        if (address) {
+          address.isDefault = false;
+          await address.save();
+        }
+      }
+    }
+
+    const updatedAddress = await Address.findByIdAndUpdate(addressId, addressForm, { new: true });
+    if (!updatedAddress) {
+      return c.notFound();
+    }
+
+    return c.json(updatedAddress, 200);
+  } catch (err: any) {
+    console.error(`Error in update one address handler: ${err.message}`);
+    return c.json({ error: "Internal Server Error" }, 500);
+  }
 });
 
 addressRoutes.delete("/:id", protectRoute, (c) => {
