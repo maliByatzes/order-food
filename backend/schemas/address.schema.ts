@@ -14,4 +14,8 @@ export const createAddressSchema = z.object({
   postalCode: true,
   city: true,
   country: true
+}).partial({
+  unitNumber: true,
+  addressLine2: true,
+  isDefault: true
 });

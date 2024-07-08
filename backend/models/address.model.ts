@@ -1,4 +1,15 @@
-import mongoose from "mongoose";
+import mongoose, { Document } from "mongoose";
+
+export interface IAddress extends Document {
+  userId: mongoose.Types.ObjectId,
+  unitNumber: string,
+  addressLine1: string,
+  addressLine2: string,
+  postalCode: number,
+  city: string,
+  country: string,
+  isDefault: boolean
+};
 
 const addressSchema = new mongoose.Schema({
   userId: {
@@ -34,6 +45,6 @@ const addressSchema = new mongoose.Schema({
   },
 }, { timestamps: true });
 
-const Address = mongoose.model("Address", addressSchema);
+const Address = mongoose.model<IAddress>("Address", addressSchema);
 
 export default Address;
