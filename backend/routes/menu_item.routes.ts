@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { protectRoute, requireAdmin } from "../middleware/protectRoute";
 import { zValidator } from "@hono/zod-validator";
-import { createMenuItemSchema } from "../schemas/menu_item.schema";
+import { createMenuItemSchema, updateMenuItemSchema } from "../schemas/menu_item.schema";
 import MenuItem from "../models/menu_item.model";
 
 const menuItemRoutes = new Hono();
@@ -72,12 +72,46 @@ menuItemRoutes.post(
     }
   });
 
+menuItemRoutes.get("/", async (c) => {
+  const categoryName = c.req.query("categoryName");
+
+  try {
+    if (!categoryName) {
+      return c.json({ error: "Missing category name" }, 400);
+    }
+
+    const menuItems = await MenuItem.find({ category: categoryName });
+    return c.json(menuItems, 200);
+  } catch (err: any) {
+    console.error(`Error in get menu items by category name handler: ${err.message}`);
+    return c.json({ error: "Internal Server Error" }, 500);
+  }
+});
+
 menuItemRoutes.put(
   "/:id",
   protectRoute,
   requireAdmin,
+  zValidator("json", updateMenuItemSchema),
   async (c) => {
-    return c.text("update one menu item route");
+    const menuItemId = c.req.param("id");
+    const menuItemForm = c.req.valid("json");
+
+    try {
+      if (menuItemId.length !== 24) {
+        return c.json({ error: "Invalid menu item id" }, 400);
+      }
+
+      const updatedMenuItem = await MenuItem.findByIdAndUpdate(menuItemId, menuItemForm, { new: true });
+      if (!updatedMenuItem) {
+        return c.notFound();
+      }
+
+      return c.json(updatedMenuItem, 200);
+    } catch (err: any) {
+      console.error(`Error in update one menu item handler: ${err.message}`);
+      return c.json({ error: "Internal Server Error" }, 500);
+    }
   });
 
 menuItemRoutes.delete(
@@ -85,7 +119,23 @@ menuItemRoutes.delete(
   protectRoute,
   requireAdmin,
   async (c) => {
-    return c.text("delete one menu item route");
+    const menuItemId = c.req.param("id");
+
+    try {
+      if (menuItemId.length !== 24) {
+        return c.json({ error: "Invalid menu item id" }, 400);
+      }
+
+      const deleteResult = await MenuItem.deleteOne({ _id: menuItemId });
+      if (deleteResult.deletedCount !== 1) {
+        return c.notFound();
+      }
+
+      return c.json({ message: "success" }, 200);
+    } catch (err: any) {
+      console.error(`Error in delete one meu item handler: ${err.message}`);
+      return c.json({ error: "Internal Server Error" }, 500);
+    }
   });
 
 export default menuItemRoutes;
