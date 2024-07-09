@@ -1,5 +1,6 @@
 const DELIVERYSTATUSES = [
   "Order Placed",
+  "Awaiting Payment",
   "Payment Processing",
   "Payment Confirmed",
   "Preparing Food",
