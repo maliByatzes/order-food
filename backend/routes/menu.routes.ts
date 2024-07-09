@@ -2,19 +2,51 @@ import { Hono } from "hono";
 import { protectRoute, requireAdmin } from "../middleware/protectRoute";
 import { zValidator } from "@hono/zod-validator";
 import { createMenuSchema } from "../schemas/menu.schema";
+import Menu from "../models/menu.model";
+import MenuItem from "../models/menu_item.model";
+import Restaurant from "../models/restaurant.model";
 
 const menuRoutes = new Hono()
 
 menuRoutes.post(
-  "/",
+  "/:id",
   protectRoute,
   requireAdmin,
   zValidator("json", createMenuSchema),
   async (c) => {
     const menuForm = c.req.valid("json");
+    const restaurantId = c.req.param("id");
 
     try {
-      return c.text("create menu handler");
+      const uniqueMenuItems = [... new Set(menuForm.items)];
+
+      for (const menuItemId of uniqueMenuItems) {
+        if (menuItemId.length !== 24) {
+          return c.json({ error: "Invalid menu item id" }, 400);
+        }
+
+        const menuItem = await MenuItem.findById(menuItemId);
+        if (!menuItem) {
+          return c.json({ error: "Menu Item not found" }, 404);
+        }
+      }
+
+      const restaurant = await Restaurant.findById(restaurantId);
+      if (!restaurant) {
+        return c.json({ error: "Restaurant not found" }, 404);
+      }
+
+      const newMenu = new Menu({
+        restaurantId: restaurant._id,
+        items: uniqueMenuItems
+      });
+
+      if (newMenu) {
+        await newMenu.save();
+        return c.json(newMenu, 201);
+      } else {
+        return c.json({ error: "Invalid data" }, 400);
+      }
     } catch (err: any) {
       console.error(`Error in create menu handler: ${err.message}`);
       return c.json({ error: "Internal Server Error" }, 500);

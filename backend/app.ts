@@ -21,7 +21,7 @@ const apiRoutes = app.basePath("/api/v1")
   .route("/address", addressRoutes)
   .route("/restaurants", restaurantRoutes)
   .route("/menu-items", menuItemRoutes)
-  .route("/menu", menuRoutes);
+  .route("/menus", menuRoutes);
 
 export default app;
 export type ApiRoutes = typeof apiRoutes;
