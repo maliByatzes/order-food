@@ -3,6 +3,7 @@ import { logger } from "hono/logger";
 import authRoutes from "./routes/auth.routes";
 import addressRoutes from "./routes/address.routes";
 import userRoutes from "./routes/user.routes";
+import restaurantRoutes from "./routes/restaurant.routes";
 
 const app = new Hono();
 
@@ -15,7 +16,8 @@ app.get('/healthchecker', (c) => {
 const apiRoutes = app.basePath("/api/v1")
   .route("/auth", authRoutes)
   .route("/users", userRoutes)
-  .route("/address", addressRoutes);
+  .route("/address", addressRoutes)
+  .route("/restaurants", restaurantRoutes);
 
 export default app;
 export type ApiRoutes = typeof apiRoutes;

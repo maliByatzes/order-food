@@ -41,3 +41,18 @@ export const protectRoute = createMiddleware(async (c: Context, next: Next) => {
     return c.json({ error: "Internal Server Error" }, 500);
   }
 });
+
+export const requireAdmin = createMiddleware(async (c: Context, next: Next) => {
+  try {
+    const user = c.get("user");
+
+    if (user.role !== "admin") {
+      return c.json({ error: "Unauthorized" }, 401);
+    }
+
+    await next();
+  } catch (err: any) {
+    console.error(`Error in requireAdmin: ${err.message}`);
+    return c.json({ error: "Internal Server Error" }, 500);
+  }
+});
