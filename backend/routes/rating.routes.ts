@@ -107,4 +107,54 @@ ratingRoutes.get("/:id", protectRoute, async (c) => {
   }
 });
 
+ratingRoutes.put(
+  "/:id",
+  protectRoute,
+  zValidator("json", createRatingSchema),
+  async (c) => {
+    const user = c.get("user");
+    const ratingForm = c.req.valid("json");
+    const ratingId = c.req.param("id");
+
+    try {
+      if (ratingId.length !== 24) {
+        return c.json({ error: "Invalid rating id" }, 400);
+      }
+
+      const updatedRating = await Rating.findOneAndUpdate({ _id: ratingId, userId: user._id }, ratingForm, { new: true });
+      if (!updatedRating) {
+        return c.notFound();
+      }
+
+      return c.json(updatedRating, 200);
+    } catch (err: any) {
+      console.error(`Error in update one rating handler: ${err.message}`);
+      return c.json({ error: "Internal Server Error" }, 500);
+    }
+  });
+
+ratingRoutes.delete(
+  "/:id",
+  protectRoute,
+  async (c) => {
+    const user = c.get("user");
+    const ratingId = c.req.param("id");
+
+    try {
+      if (ratingId.length !== 24) {
+        return c.json({ error: "Invalid rating id" }, 400);
+      }
+
+      const deleteResult = await Rating.deleteOne({ _id: ratingId, userId: user._id });
+      if (deleteResult.deletedCount !== 1) {
+        return c.notFound();
+      }
+
+      return c.json({ message: "success" }, 200);
+    } catch (err: any) {
+      console.error(`Error in delete one rating handler: ${err.message}`);
+      return c.json({ error: "Internal Server Error" }, 500);
+    }
+  });
+
 export default ratingRoutes;
