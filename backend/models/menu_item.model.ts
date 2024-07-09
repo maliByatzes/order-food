@@ -6,7 +6,7 @@ export interface IMenuItem {
   price: mongoose.Types.Decimal128,
   description?: string,
   category: string,
-  image: string,
+  image?: string,
   availability: boolean,
   createdAt: Date,
   updatedAt: Date
