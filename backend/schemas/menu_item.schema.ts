@@ -6,15 +6,12 @@ export const createMenuItemSchema = z.object({
   price: z.number(),
   description: z.string(),
   category: z.enum(CATEGORIES),
-  image: z.string(),
-  availability: z.boolean()
 }).required({
   name: true,
   price: true,
   category: true
 }).partial({
-  description: true,
-  image: true
+  description: true
 });
 
 export const updateMenuItemSchema = z.object({
@@ -22,6 +19,5 @@ export const updateMenuItemSchema = z.object({
   price: z.number(),
   description: z.string(),
   category: z.enum(CATEGORIES),
-  image: z.string(),
   availability: z.boolean()
 }).partial();
