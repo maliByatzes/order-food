@@ -57,7 +57,13 @@ menuRoutes.get("/:id", async (c) => {
   const restaurantId = c.req.param("id");
 
   try {
-    return c.text("get all menus of restaurant handler");
+    const restaurant = await Restaurant.findById(restaurantId);
+    if (!restaurant) {
+      return c.json({ error: "Restaurant not found" }, 404);
+    }
+
+    const menus = await Menu.find({ restaurantId }).populate("items");
+    return c.json(menus, 200);
   } catch (err: any) {
     console.error(`Error in get all menus of restaurant handler: ${err.message}`);
     return c.json({ error: "Internal Server Error" }, 500);
