@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 export interface IAddress {
-  _id?: mongoose.Types.ObjectId,
+  _id: mongoose.Types.ObjectId,
   userId: mongoose.Types.ObjectId,
   unitNumber?: string,
   addressLine1: string,

@@ -101,9 +101,29 @@ menuRoutes.put(
   zValidator("json", createMenuSchema),
   async (c) => {
     const { restaurantId, id } = c.req.param();
+    const menuForm = c.req.valid("json");
 
     try {
-      return c.text("remove menu items from menu of restaurant handler");
+      const uniqueMenuItems = [... new Set(menuForm.items)];
+
+      const restaurant = await Restaurant.findById(restaurantId);
+      if (!restaurant) {
+        return c.json({ error: "Restaurant not found" }, 404);
+      }
+
+      const menu = await Menu.findOne({
+        _id: id,
+        restaurantId: restaurant._id
+      });
+      if (!menu) {
+        return c.json({ error: "Menu not found" }, 404);
+      }
+
+      const filteredMenuItems = menu.items.filter(menuItem => !uniqueMenuItems.includes(menuItem._id?.toString()));
+      menu.items = filteredMenuItems;
+
+      await menu.save();
+      return c.json({ message: "success" }, 200);
     } catch (err: any) {
       console.error(`Error in remove menu items from menu of restaurant handler: ${err.message}`);
       return c.json({ error: "Internal Server Error" }, 500);
@@ -117,9 +137,39 @@ menuRoutes.put(
   zValidator("json", createMenuSchema),
   async (c) => {
     const { restaurantId, id } = c.req.param();
+    const menuForm = c.req.valid("json");
 
     try {
-      return c.text("add menu items to menu of restaurant handler");
+      const uniqueMenuItems = [... new Set(menuForm.items)];
+
+      const restaurant = await Restaurant.findById(restaurantId);
+      if (!restaurant) {
+        return c.json({ error: "Restaurant not found" }, 404);
+      }
+
+      const menu = await Menu.findOne({
+        _id: id,
+        restaurantId: restaurant._id
+      });
+      if (!menu) {
+        return c.json({ error: "Menu not found" }, 404);
+      }
+
+      for (const menuItemId of uniqueMenuItems) {
+        if (menuItemId.length !== 24) {
+          return c.json({ error: "Invalid menu item id" }, 400);
+        }
+
+        const menuItem = await MenuItem.findById(menuItemId);
+        if (!menuItem) {
+          return c.json({ error: "Menu Item not found" }, 404);
+        }
+
+        menu.items.push(menuItem);
+      }
+
+      await menu.save();
+      return c.json({ message: "success" }, 200);
     } catch (err: any) {
       console.error(`Error add menu items in menu of restaurant handler: ${err.message}`);
       return c.json({ error: "Internal Server Error" }, 500);

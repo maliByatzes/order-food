@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 export interface IRestaurant {
-  _id?: mongoose.Types.ObjectId,
+  _id: mongoose.Types.ObjectId,
   name: string,
   address: string,
   phone: string,

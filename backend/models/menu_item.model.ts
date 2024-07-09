@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 export interface IMenuItem {
-  _id?: mongoose.Types.ObjectId,
+  _id: mongoose.Types.ObjectId,
   name: string,
   price: mongoose.Types.Decimal128,
   description?: string,

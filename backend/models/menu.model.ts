@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import type { IMenuItem } from "./menu_item.model";
 
 export interface IMenu {
-  _id?: mongoose.Types.ObjectId,
+  _id: mongoose.Types.ObjectId,
   restaurantId: mongoose.Types.ObjectId,
   items: IMenuItem[],
   createdAt: Date,
