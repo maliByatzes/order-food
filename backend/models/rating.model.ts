@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 export interface IRating {
   _id: mongoose.Types.ObjectId,
   userId: mongoose.Types.ObjectId,
-  restauarantId: mongoose.Types.ObjectId,
+  restaurantId: mongoose.Types.ObjectId,
   rating: number,
   createdAt: Date,
   updatedAt: Date
@@ -15,7 +15,7 @@ const ratingSchema = new mongoose.Schema<IRating>({
     ref: "User",
     required: true
   },
-  restauarantId: {
+  restaurantId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Restaurant",
     required: true

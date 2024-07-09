@@ -6,6 +6,7 @@ import userRoutes from "./routes/user.routes";
 import restaurantRoutes from "./routes/restaurant.routes";
 import menuItemRoutes from "./routes/menu_item.routes";
 import menuRoutes from "./routes/menu.routes";
+import ratingRoutes from "./routes/rating.routes";
 
 const app = new Hono();
 
@@ -21,7 +22,8 @@ const apiRoutes = app.basePath("/api/v1")
   .route("/address", addressRoutes)
   .route("/restaurants", restaurantRoutes)
   .route("/menu-items", menuItemRoutes)
-  .route("/menus", menuRoutes);
+  .route("/menus", menuRoutes)
+  .route("/ratings", ratingRoutes);
 
 export default app;
 export type ApiRoutes = typeof apiRoutes;
